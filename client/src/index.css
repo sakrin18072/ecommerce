@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&display=swap');
+*{
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+  font-family: 'Ubuntu', sans-serif;
+  font-size: medium;
+}
+
+.navbar{
+  text-transform: uppercase;
+  background-color: #212527;
+  box-shadow: 0px 2px 4px #212527;
+  border-bottom: 0.3px solid #212527 !important; 
+}
+.nav-link-1{
+  color: #fff !important;
+}
+.active{
+  background-color: #fff !important;
+  border: 1px solid #fff;
+  border-radius: 20px;
+  color: #212527 !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+.navbar-brand{
+  font-family: 'Noto Sans JP', sans-serif;
+  color: #fff;
+}
+.footer-link{
+  text-decoration: none;
+  color:#fff;
+}
+.pnf{
+  text-decoration: none;
+  font-size: large;
+  color: black;
+  border: 1px solid black;
+  padding: 7px;
+  border-radius: 25px;
+}
+.btn--{
+  background-color: #212527;
+  color: #fff;
+}
+.btn--:hover{
+  background-color: #212527;
+  color: #fff;
+}
+.class{
+  color: #212527;
+  background-color: #fff;
+}
+.class:hover{
+  background-color: #fff;
+  color:#212527
+}
+.class-1{
+  color: #212527;
+}
+.class-1:hover{
+  background-color: #fff;
+}
+.class-2{
+  color: #212527
+}
+.text{
+  text-decoration: none;
+  color: #212527;
+}
+.text:hover{
+  text-decoration: none;
+  color: #000;
+}
+

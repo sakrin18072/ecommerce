@@ -14,10 +14,10 @@ router.post(
   requireSignIn,
   isAdmin,
   createCategoryController
-);
+); 
 router.put(
   "/update-category/:nameOfCategory",
-  requireSignIn,
+  requireSignIn, 
   isAdmin,
   updateCategoryController
 );
@@ -25,7 +25,7 @@ router.get("/categories", categoryController);
 router.get("/single-category/:slug", singleCategoryController);
 router.delete(
   "/delete-category/:category",
-  requireSignIn,
+  requireSignIn, 
   isAdmin,
   deleteCategoryController
 );
