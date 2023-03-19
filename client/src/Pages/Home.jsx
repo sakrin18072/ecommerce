@@ -1,5 +1,4 @@
 import Layout from "../components/Layout/Layout";
-import { useAuth } from "../Contexts/AuthorizationContext";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Checkbox, Radio } from "antd";
@@ -9,6 +8,32 @@ const Home = () => {
   const [products, setProducts] = useState([]);
   const [checked, setChecked] = useState([]);
   const [radio, setRadio] = useState([]);
+  const [count, setCount] = useState(0);
+  const [page, setPage] = useState(1);
+  const getTotalCount = async (request, response) => {
+    try {
+      const { data } = await axios.get("/api/v1/product/product-count");
+      if (data?.success) {
+        setCount(data.count);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const fetchFilteredProducts = async () => {
+    try {
+      const { data } = await axios.post("/api/v1/product/filter-product", {
+        checked,
+        radio,
+      });
+      if (data?.success) {
+        setProducts(data.products);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleFilter = (value, id) => {
     let all = [...checked];
     if (value) {
@@ -21,18 +46,23 @@ const Home = () => {
 
   const fetchProducts = async () => {
     try {
-      const { data } = await axios.get("/api/v1/product/products");
+      const { data } = await axios.get(`/api/v1/product/product-list/${page}`);
 
       if (data?.success) {
-        setProducts(data?.products);
+        setProducts(...products, data?.products);
       }
     } catch (error) {
       console.log(error);
     }
   };
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    if (!checked.length && !radio.length) fetchProducts();
+  }, [checked.length, radio.length]);
+
+  useEffect(() => {
+    if (checked.length || radio.length) fetchFilteredProducts();
+    // eslint-disable-next-line
+  }, [checked, radio]);
   const fetchCategories = async () => {
     try {
       const resp = await axios.get("/api/v1/category/categories");
@@ -45,8 +75,21 @@ const Home = () => {
   };
   useEffect(() => {
     fetchCategories();
+    getTotalCount();
   }, []);
 
+  const fetchPage = async () => {
+    try {
+      const { data } = await axios.get(`/api/v1/product/product-list/${page}`);
+      setProducts([...products, ...data?.products]);
+    } catch (error) {
+      console.log(error)
+    }
+  };
+  useEffect(()=>{
+    if(page===1) return;
+    fetchPage();
+  },[page])
   return (
     <Layout>
       <div className="container-fluid">
@@ -68,10 +111,20 @@ const Home = () => {
               <Radio.Group onChange={(e) => setRadio(e.target.value)}>
                 {priceFilter.map((p) => (
                   <div key={p._id}>
-                    <Radio value={p.array}>{p.name}</Radio>
+                    <Radio value={p.price}>{p.name}</Radio>
                   </div>
                 ))}
               </Radio.Group>
+            </div>
+            <div>
+              <button
+                className="btn btn-dark mt-3"
+                onClick={() => {
+                  window.location.reload();
+                }}
+              >
+                Reset Filters
+              </button>
             </div>
           </div>
           <div className="col-11 col-md-9 mt-3">
@@ -79,15 +132,25 @@ const Home = () => {
             <div className="d-flex flex-wrap">
               {products?.map((p) => {
                 return (
-                  <div className="card m-1 p-2" style={{ width: "18rem" }}>
+                  <div
+                    className="card m-1 p-2 mx-auto"
+                    style={{ width: "18rem" }}
+                  >
                     <img
                       src={`/api/v1/product/get-photo/${p._id}`}
                       className="card-img-top"
                       alt={p.name}
+                      style={{ height: "22rem", objectFit: "contain" }}
                     />
                     <div className="card-body">
-                      <h5 className="card-title">{p?.name}</h5>
-                      <p className="card-text">{p?.description}</p>
+                      <h5 className="card-title">{p?.name.substring(0, 30)}</h5>
+                      <p className="card-text">
+                        {p?.description.substring(0, 30)}...
+                      </p>
+                      <p className="card-text">
+                        {"\u20B9 "}
+                        {p?.price}
+                      </p>
                       <button className="btn btn-dark ms-1">
                         More details
                       </button>
@@ -98,6 +161,19 @@ const Home = () => {
                   </div>
                 );
               })}
+            </div>
+            <div>
+              {products && products?.length < count && (
+                <button
+                  className="btn btn-dark m-3"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setPage(page + 1);
+                  }}
+                >
+                  View more products
+                </button>
+              )}
             </div>
           </div>
         </div>

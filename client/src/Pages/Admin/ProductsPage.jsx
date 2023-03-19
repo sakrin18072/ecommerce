@@ -46,10 +46,12 @@ const ProductsPage = () => {
                     src={`/api/v1/product/get-photo/${p._id}`}
                     className="card-img-top"
                     alt={p.name}
+                    style={{height:"22rem",padding:'30px'}}
                   />
                   <div className="card-body">
-                    <h5 className="card-title">{p?.name}</h5>
-                    <p className="card-text">{p?.description}</p>
+                    <h5 className="card-title">{p?.name.substring(0, 30)}</h5>
+                    <p className="card-text">{p?.description.substring(0, 30)}...</p>
+                    <p className="card-text">{"\u20B9"} {p?.price}</p>
                   </div>
                 </div>
               </Link>
