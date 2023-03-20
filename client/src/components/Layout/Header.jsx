@@ -2,8 +2,10 @@ import React from 'react'
 import { NavLink, Link } from 'react-router-dom'
 import { useAuth } from '../../Contexts/AuthorizationContext'
 import toast from 'react-hot-toast'
+import SearchInput from '../SearchInput'
+import { useCart } from '../../Contexts/CartContext'
 const Header = () => {
-
+    const [cart,setCart] = useCart();
     const [auth, setAuth] = useAuth()
     const handleLogout = () => {
         setAuth({
@@ -21,13 +23,18 @@ const Header = () => {
                         <span className="navbar-toggler-icon" />
                     </button>
                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
+
                         <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
+                        <li className='nav-item '>
+                                <SearchInput/>
+                            </li>
+                        </ul>
+                        <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
+                            
                             <li className="nav-item">
                                 <NavLink to="/" className="nav-link nav-link-1" aria-current="page">Home</NavLink>
                             </li>
-                            <li className="nav-item">
-                                <NavLink to="/category" className="nav-link nav-link-1" aria-current="page">Category</NavLink>
-                            </li>
+                            
                             {
                                 !auth.user ?
                                     (
@@ -59,7 +66,7 @@ const Header = () => {
                                     )
                             }
                             <li className="nav-item">
-                                <NavLink to="/cart" className="nav-link nav-link-1">Cart (0)</NavLink>
+                                <NavLink to="/cart" className="nav-link nav-link-1">Cart ({cart?.length})</NavLink>
                             </li>
                         </ul>
                     </div>

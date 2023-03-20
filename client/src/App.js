@@ -20,13 +20,19 @@ import EditProfile from "./Pages/User/EditProfile";
 import ChangePassword from "./Pages/User/ChangePassword";
 import ProductsPage from "./Pages/Admin/ProductsPage";
 import UpdateProduct from "./Pages/Admin/UpdateProduct";
+import Search from "./Pages/User/Search";
+import ProductDetail from "./Pages/User/ProductDetail";
+import CartPage from "./Pages/User/CartPage";
 function App() {
   return (
     <div>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/cart" element={<CartPage />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/search" element={<Search/>}/>
+        <Route path="/product/:slug" element={<ProductDetail/>}/>
         <Route path="/dashboard" element={<PrivateRoute />}>
           <Route path="user" element={<UserDashboard />} />
           <Route path="user/order-history" element={<OrderHistory />} />

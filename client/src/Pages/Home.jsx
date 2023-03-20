@@ -3,6 +3,9 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Checkbox, Radio } from "antd";
 import { priceFilter } from "../components/priceFilters";
+import { useNavigate } from "react-router-dom";
+import { useCart } from "../Contexts/CartContext";
+import toast from "react-hot-toast";
 const Home = () => {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
@@ -10,6 +13,8 @@ const Home = () => {
   const [radio, setRadio] = useState([]);
   const [count, setCount] = useState(0);
   const [page, setPage] = useState(1);
+  const [cart, setCart] = useCart();
+  const navigate = useNavigate();
   const getTotalCount = async (request, response) => {
     try {
       const { data } = await axios.get("/api/v1/product/product-count");
@@ -83,13 +88,13 @@ const Home = () => {
       const { data } = await axios.get(`/api/v1/product/product-list/${page}`);
       setProducts([...products, ...data?.products]);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
-  useEffect(()=>{
-    if(page===1) return;
+  useEffect(() => {
+    if (page === 1) return;
     fetchPage();
-  },[page])
+  }, [page]);
   return (
     <Layout>
       <div className="container-fluid">
@@ -151,10 +156,20 @@ const Home = () => {
                         {"\u20B9 "}
                         {p?.price}
                       </p>
-                      <button className="btn btn-dark ms-1">
+                      <button
+                        className="btn btn-dark ms-1"
+                        onClick={() => navigate(`/product/${p.slug}`)}
+                      >
                         More details
                       </button>
-                      <button className="btn btn-secondary ms-1">
+                      <button
+                        className="btn btn-secondary ms-1"
+                        onClick={() => {
+                          setCart([...cart, p]);
+                          toast.success("Item added to cart");
+                          localStorage.setItem('cart',JSON.stringify([...cart,p]));
+                        }}
+                      >
                         Add to cart
                       </button>
                     </div>

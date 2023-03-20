@@ -218,52 +218,103 @@ export const filterProductController = async (request, response) => {
     }
     const products = await productModel.find(args);
     return response.status(200).send({
+      success: true,
+      products,
+    });
+  } catch (error) {
+    console.log(error);
+    response.status(400).send({
+      success: false,
+      message: "Error in filtering products",
+      error,
+    });
+  }
+};
+
+export const productCountController = async (request, response) => {
+  try {
+    const count = await productModel.find({}).estimatedDocumentCount();
+    response.status(200).send({
+      success: true,
+      count,
+    });
+  } catch (error) {
+    console.log(error);
+    response.status(400).send({
+      success: false,
+      message: "Error in fetching product count",
+      error,
+    });
+  }
+};
+
+export const productPageController = async (request, response) => {
+  try {
+    const page = request.params.page ? request.params.page : 1;
+    const itemsPerPage = 6;
+    const products = await productModel
+      .find({})
+      .select("-photo")
+      .skip((page - 1) * itemsPerPage)
+      .limit(itemsPerPage)
+      .sort({ createdAt: -1 });
+    response.status(200).send({
+      success: true,
+      message: "Products fetched successfully",
+      products,
+    });
+  } catch (error) {
+    console.log(error);
+    response.status(400).send({
+      success: false,
+      message: "Error in product page controller",
+      error,
+    });
+  }
+};
+
+export const searchProductController = async (request, response) => {
+  try {
+    const { key } = request.params;
+    const result = await productModel
+      .find({
+        $or: [
+          { name: { $regex: key, $options: "i" } },
+          { description: { $regex: key, $options: "i" } },
+        ],
+      })
+      .select("-photo");
+    return response.status(201).send({
+      success:true,
+      products:result
+    })
+  } catch (error) {
+    console.log(error);
+    response.status(400).send({
+      success: false,
+      message: "Error in searchProductController",
+      error,
+    });
+  }
+};
+
+export const similarProductsController = async (request,response) =>{
+  try {
+    const {pid,cid} = request.params;
+    const products = await productModel.find({
+      category:cid,
+      _id:{$ne:pid}
+    }).select("-photo").limit(9).populate("category");
+    return response.status(201).send({
       success:true,
       products
     })
   } catch (error) {
     console.log(error);
     response.status(400).send({
-      success:false,
-      message:"Error in filtering products",
-      error
-    })
-  }
-};
-
-export const productCountController=async (request,response)=>{
-  try {
-    const count = await productModel.find({}).estimatedDocumentCount();
-    response.status(200).send({
-      success:true,
-      count
-    })
-  } catch (error) {
-    console.log(error)
-    response.status(400).send({
-      success:false,
-      message:"Error in fetching product count",
-      error
-    })
-  }
-}
-
-export const productPageController = async (request,response)=>{
-  try {
-    const page =request.params.page? request.params.page:1
-    const itemsPerPage = 6;
-    const products = await productModel.find({}).select("-photo").skip((page-1)*itemsPerPage).limit(itemsPerPage).sort({createdAt:-1})
-    response.status(200).send({
-      success:true,
-      message:"Products fetched successfully",
-      products
-    })
-  } catch (error) {
-    console.log(error)
-    response.status(400).send({
-      success:false,
-      message:"Error in product page controller",
-      error
-    })
+      success: false,
+      message: "Error in similarProductsController",
+      error,
+    });
   }
 }
