@@ -1,10 +1,29 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout/Layout";
 import { useCart } from "../../Contexts/CartContext";
 import { useAuth } from "../../Contexts/AuthorizationContext";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import DropIn from 'braintree-web-drop-in-react'
 const CartPage = () => {
   const [auth, setAuth] = useAuth();
   const [cart, setCart] = useCart();
+  const [clientToken,setClientToken] = useState("");
+  const [instance,setInstance] = useState("")
+  const navigate = useNavigate();
+
+  const getToken = async()=>{
+    try {
+      const {data} =await axios.get('/api/v1/product/braintree/token');
+      setClientToken(data?.clientToken);
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(()=>{
+    getToken();
+  },[auth?.token])
   const handleRemove = (pid) => {
     try {
       const Cart = [...cart];
@@ -25,6 +44,19 @@ const CartPage = () => {
       console.log(error);
     }
   };
+
+  const handlePayment = async (request,response)=>{
+    try {
+      const {nonce} = await instance.requestPaymentMethod();
+      const {data} = await axios.post('/api/v1/product/braintree/payment', {nonce,cart});
+      localStorage.removeItem('cart');
+      setCart([]);
+      navigate('/dashboard/user/order-history')
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   return (
     <Layout>
       <div className="container mx-auto">
@@ -75,16 +107,43 @@ const CartPage = () => {
               </div>
             ))}
           </div>
-          <div
-            className="col-10 col-md-4 mx-auto"
-            style={{ marginTop: "65vh" }}
-          >
+          <div className="col-10 col-md-4 mx-auto">
             <h4>Cart Summary</h4>
             <hr />
             <div>
               <span>Total Payable: </span> {"\u20B9"}
               {totalCalc()}
             </div>
+            <div className="col-10 col-md-4 mt-3">
+              {!auth?.user && (
+                <button
+                  className="btn btn-dark"
+                  onClick={() =>
+                    navigate("/login", {
+                      state: "/cart",
+                    })
+                  }
+                >
+                  Login to checkout
+                </button>
+              )}
+            </div>
+            {!clientToken || !cart.length ? (""):
+            <>
+            <div className="mt-3">
+              <DropIn
+              options={{
+                authorization:clientToken,
+                paypal:{
+                  flow:'vault'
+                }
+              }}
+              onInstance={(instance)=>setInstance(instance)}
+              />
+              {auth?.user && <button className="btn btn-dark mx-auto w-100 m-3" onClick={handlePayment}>Make Payment</button>}
+            </div>
+            </>
+            }
           </div>
         </div>
       </div>

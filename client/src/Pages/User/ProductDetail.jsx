@@ -62,7 +62,7 @@ const ProductDetail = () => {
       </div>
       <div className="row mx-auto">
         <h3 className="text-center">
-          {relatedProducts.length > 1 ? (
+          {relatedProducts.length > 0 ? (
             <h3 className="text-warning" style={{ display: "inline" }}>
               <h3 style={{ display: "inline" }} className="text-dark">
                 Similar

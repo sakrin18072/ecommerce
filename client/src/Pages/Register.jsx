@@ -29,7 +29,7 @@ const Register = () => {
             
             <form onSubmit={handleSubmit(formSubmit)}
             className='d-flex flex-column row-cols-3 justify-content-center align-items-center'
-             style={{fontSize:'medium',color:'rgb(32, 115, 120)',minHeight:'70vh'}}
+             style={{fontSize:'medium',minHeight:'70vh'}}
             >
                 <h1 className='text-center m-3'>Register</h1>
                 
