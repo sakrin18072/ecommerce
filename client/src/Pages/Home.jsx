@@ -101,7 +101,7 @@ const Home = () => {
   return (
     <Layout>
       <img
-        src="https://lh3.googleusercontent.com/oy_bkQwRFi10diExjhtUYsRBjsPAj9bz6yDyN_OKxi1c_DP6vhsR6H597YQIOBqtBDjumALewclegPEO-3wpTdS9nG1Tnnljry2sW5sJk2yS5saKnxCSQ30iBvyEp9CbaxVPPFI-00hLLKI5IfUGaFMlIlXE1BCvBYvmfZ8euDcK51iBi1AZsOTRyvKYa1MM1fnHVvIfoWtGBDPciVF0CH2mePtOnvYUHJAwgLvrilaQ-y7SHMn9p2ARraRPtZrapCVOVJlVHQ2lC_bybY04J_qA7ulJtpbdHUeWCkxfXIUHhTpZyJhSxKSMfr0E0ftUeHRZCIDVIwl1JjsCKRBrntGAveAb3qaGZOljYxYj-kk6OeyII0S3cqtPktdOVN-_lylKKgtiGQ-MbE4G-LtKn-tYkZl7oeqLjFibujlDsvRPQ9d3T8il4E8g8iVLo2g0xPFW3qzYQkljGQE0925ZOO85G1jRA4ao1Jd19zi3p1L9Ahm_pj8vwO-kf2JLiHDufztuBNRhh7Q7XLzL0p0BxAWGYdZTAND9ha02utzrjNaoCJtBASQrYWN1fUFNRcIJnPtt5jetiHXJp53_80HbKVbB6PUwaPwMr8mEzwJARnX_cQ_wVN4TGUb1bSSnmXogGnBlD1iGed1v2d5FAfr2Fsb_f3GP7XueuKC3vJidx3skp4ZL2vkMZ1D7V3FuxK2HVvudsjnB7FZAOJvyzMimhxWeiekWKF_ULqODm6wNQViS78AQ1rGGIgqxdJt1qTjAYzixtnlKVfRcPzfvtDSvw1YPAtH3H8edM7HTQaQ8mJoaJTVvWnZnyQD1zvR-nXo0jnU3ibbvSczNMXfqXGzNRLx3WfNiXr72S3B9kxnERJ5_yMEmlqANEH5VzhbCcFqHwSaxJNKQq7bnyI993Wqi5ZEqrH9V01dkTmpccVezvkOyJIMat_AMV_RclNiP2u71clyPRyFZYjGEOudR3dPyGm4=w1920-h480-s-no?authuser=0"
+        src="https://images.pexels.com/photos/1133500/pexels-photo-1133500.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
         className="img-fluid"
         alt="ResponsiveImage"
         style={{ width: "100%", height: "auto" }}
