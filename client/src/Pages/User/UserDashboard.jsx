@@ -2,22 +2,22 @@ import React from 'react'
 import Layout from '../../components/Layout/Layout'
 import { useAuth } from '../../Contexts/AuthorizationContext'
 import UserPanel from './UserPanel'
+
 const UserDashboard = () => {
-  const [auth,setAuth] = useAuth()
+  const [auth, setAuth] = useAuth()
 
   return (
     <Layout>
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-2 m-3">
-            <UserPanel/>
+      <div className="container mx-auto">
+        <div className="flex">
+          <div className="w-1/4 p-4">
+            <UserPanel />
           </div>
-          <div className="col-8 m-3 class-2">
-            <h4>User Name: {auth?.user?.name}</h4>
-            <p>Email: {auth?.user?.email}</p>
-            <p>Phone: {auth?.user?.phone}</p>
-            <p>Address: {auth?.user?.address}</p>
-
+          <div className="w-3/4 p-4 bg-white rounded ">
+            <h4 className="text-2xl font-bold mb-4">User Name: {auth?.user?.name}</h4>
+            <p className="mb-2">Email: {auth?.user?.email}</p>
+            <p className="mb-2">Phone: {auth?.user?.phone}</p>
+            <p className="mb-2">Address: {auth?.user?.address}</p>
           </div>
         </div>
       </div>
@@ -25,4 +25,4 @@ const UserDashboard = () => {
   )
 }
 
-export default UserDashboard
+export default UserDashboard;

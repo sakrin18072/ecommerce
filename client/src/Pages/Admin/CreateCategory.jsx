@@ -83,12 +83,12 @@ const CreateCategory = () => {
 
   return (
     <Layout>
-      <div className="container-fluid">
+      <div className="container-fluid text-base bg-gradient-to-b from-blue-800 to-blue-200">
         <div className="row">
           <div className="col-10 col-md-2 m-3">
             <AdminPanel />
           </div>
-          <div className="col-10 col-md-8 w-50 mx-auto m-3">
+          <div className="col-10 col-md-8 w-50 mx-auto m-3 bg-white rounded-3xl p-5">
             <CategoryForm
               name={name}
               setName={setName}
@@ -106,8 +106,8 @@ const CreateCategory = () => {
                   <tr key={category._id}>
                     <td>{category?.name}</td>
                     <td>
-                      <button className="btn btn-dark ms-1" onClick={()=>{handleOpen();setUpdatedName(category.name);setSlug(category.slug)}}>Edit</button>
-                      <button className="btn btn-danger ms-1" onClick={()=>{handleDelete(category.slug);}}>Delete</button>
+                      <button className="btn bg-blue-400 hover:bg-blue-500 text-white ms-1" onClick={()=>{handleOpen();setUpdatedName(category.name);setSlug(category.slug)}}>Edit</button>
+                      <button className="btn bg-blue-800 hover:bg-blue-700 text-white ms-1" onClick={()=>{handleDelete(category.slug);}}>Delete</button>
                     </td>
                   </tr>
                 ))}

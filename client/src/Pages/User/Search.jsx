@@ -39,7 +39,7 @@ const Search = () => {
                     {p?.price}
                   </p>
                   <button
-                    className="btn btn-dark ms-1"
+                    className="btn bg-blue-400 text-white ms-1 border-transparent hover:bg-blue-600"
                     onClick={() => {
                       navigate(`/product/${p.slug}`);
                       window.location.reload();
@@ -48,7 +48,7 @@ const Search = () => {
                     More details
                   </button>
                   <button
-                    className="btn btn-secondary ms-1"
+                    className="btn btn-secondary bg-blue-700 ms-1 border-transparent hover:bg-blue-500"
                     onClick={() => {
                       setCart([...cart, p]);
                       toast.success("Item added to cart");

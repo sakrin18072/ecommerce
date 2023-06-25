@@ -16,7 +16,7 @@ const CategoryForm = ({name,setName,handleSubmit}) => {
           }}
         />
       </div>
-      <button type="submit" className="btn btn-primary mt-3">
+      <button type="submit" className="btn bg-blue-800 hover:bg-blue-500 text-white mt-3">
         Submit
       </button>
     </form>

@@ -52,13 +52,13 @@ const CreateProduct = () => {
   };
   return (
     <Layout>
-      <div className="container-fluid">
+      <div className="container-fluid bg-gradient-to-b from-blue-800 to-blue-200">
         <div className="row">
           <div className="col-10 col-md-2 m-3">
             <AdminPanel />
           </div>
-          <div className="col-10 mx-auto col-md-8 w-50">
-            <h1 className="m-3">Create Product</h1>
+          <div className="col-10 mx-auto col-md-8 w-50 text-base bg-white p-5 rounded-3xl m-3">
+            <h1 className="m-3 text-2xl text-center font-bold">Create Product</h1>
             <Select
               bordered={false}
               placeholder="Select a category"
@@ -75,7 +75,7 @@ const CreateProduct = () => {
               ))}
             </Select>
             <div className="mb-3">
-              <label className="btn btn-outline-dark col-md-12">
+              <label className="btn bg-blue-500 text-white hover:bg-blue-800 col-md-12">
                 {photo ? photo.name : "upload photo"}
                 <input
                   type="file"
@@ -152,7 +152,7 @@ const CreateProduct = () => {
               <Option value="1">Yes</Option>
               <Option value="0">No</Option>
             </Select>
-            <button className="btn btn-dark mb-3" onClick={handleUpdate}>
+            <button className="btn bg-blue-700 hover:bg-blue-800 text-white mb-3" onClick={handleUpdate}>
               Create Product
             </button>
           </div>

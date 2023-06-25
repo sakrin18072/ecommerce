@@ -1,11 +1,12 @@
-import Layout from "../components/Layout/Layout";
-import { useState, useEffect } from "react";
-import axios from "axios";
-import { Checkbox, Radio } from "antd";
-import { priceFilter } from "../components/priceFilters";
-import { useNavigate } from "react-router-dom";
-import { useCart } from "../Contexts/CartContext";
-import toast from "react-hot-toast";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Checkbox, Radio } from 'antd';
+import { priceFilter } from '../components/priceFilters';
+import { useNavigate } from 'react-router-dom';
+import { useCart } from '../Contexts/CartContext';
+import toast from 'react-hot-toast';
+import Layout from '../components/Layout/Layout';
+
 const Home = () => {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
@@ -15,9 +16,10 @@ const Home = () => {
   const [page, setPage] = useState(1);
   const [cart, setCart] = useCart();
   const navigate = useNavigate();
-  const getTotalCount = async (request, response) => {
+
+  const getTotalCount = async () => {
     try {
-      const { data } = await axios.get("/api/v1/product/product-count");
+      const { data } = await axios.get('/api/v1/product/product-count');
       if (data?.success) {
         setCount(data.count);
       }
@@ -25,9 +27,10 @@ const Home = () => {
       console.log(error);
     }
   };
+
   const fetchFilteredProducts = async () => {
     try {
-      const { data } = await axios.post("/api/v1/product/filter-product", {
+      const { data } = await axios.post('/api/v1/product/filter-product', {
         checked,
         radio,
       });
@@ -45,7 +48,7 @@ const Home = () => {
       all.push(id);
     } else {
       all = all.filter((c) => c !== id);
-      if(all.length === 0) {
+      if (all.length === 0) {
         window.location.reload();
       }
     }
@@ -55,25 +58,30 @@ const Home = () => {
   const fetchProducts = async () => {
     try {
       const { data } = await axios.get(`/api/v1/product/product-list/${page}`);
-
       if (data?.success) {
-        setProducts(...products, data?.products);
+        setProducts((prevProducts) => [...prevProducts, ...data?.products]);
       }
     } catch (error) {
       console.log(error);
     }
   };
+
   useEffect(() => {
-    if (!checked.length && !radio.length) fetchProducts();
+    if (!checked.length && !radio.length) {
+      fetchProducts();
+    }
   }, [checked, radio]);
 
   useEffect(() => {
-    if (checked.length !== 0 || radio.length !== 0) fetchFilteredProducts();
+    if (checked.length !== 0 || radio.length !== 0) {
+      fetchFilteredProducts();
+    }
     // eslint-disable-next-line
   }, [checked, radio]);
+
   const fetchCategories = async () => {
     try {
-      const resp = await axios.get("/api/v1/category/categories");
+      const resp = await axios.get('/api/v1/category/categories');
       if (resp?.data?.success) {
         setCategories(resp?.data?.categories);
       }
@@ -81,6 +89,7 @@ const Home = () => {
       console.log(error);
     }
   };
+
   useEffect(() => {
     fetchCategories();
     getTotalCount();
@@ -89,35 +98,28 @@ const Home = () => {
   const fetchPage = async () => {
     try {
       const { data } = await axios.get(`/api/v1/product/product-list/${page}`);
-      setProducts([...products, ...data?.products]);
+      setProducts((prevProducts) => [...prevProducts, ...data?.products]);
     } catch (error) {
       console.log(error);
     }
   };
+
   useEffect(() => {
     if (page === 1) return;
     fetchPage();
   }, [page]);
+
   return (
     <Layout>
-      <img
-        src="https://images.pexels.com/photos/1133500/pexels-photo-1133500.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
-        className="img-fluid"
-        alt="ResponsiveImage"
-        style={{ width: "100%", height: "auto" }}
-      />
-
-      <div className="container-fluid">
-        <div className="row">
-          
-
-          <div className="col-11 col-md-2 mt-3">
-            <h4>Category filters</h4>
-            <div className="d-flex flex-column">
+      <div className="container mx-auto">
+        <div className="flex flex-wrap justify-center">
+          <div className="w-full sm:w-1/2 md:w-1/4 mt-3 px-2">
+            <h4 className="text-base font-semibold">Category filters</h4>
+            <div className="flex flex-col mt-2">
               {categories?.map((c) => (
-                <div>
+                <div key={c._id} className="mb-2">
                   <Checkbox
-                    key={c._id}
+                    className="text-sm text-gray-700"
                     onChange={(e) => handleFilter(e.target.checked, c._id)}
                   >
                     {c.name}
@@ -125,19 +127,21 @@ const Home = () => {
                 </div>
               ))}
             </div>
-            <h4 className="mt-3">Price filters</h4>
-            <div className="d-flex flex-column">
+            <h4 className="mt-4 text-base font-semibold">Price filters</h4>
+            <div className="mt-2">
               <Radio.Group onChange={(e) => setRadio(e.target.value)}>
                 {priceFilter.map((p) => (
-                  <div key={p._id}>
-                    <Radio value={p.price}>{p.name}</Radio>
+                  <div key={p._id} className="mb-2">
+                    <Radio className="text-sm text-gray-700" value={p.price}>
+                      {p.name}
+                    </Radio>
                   </div>
                 ))}
               </Radio.Group>
             </div>
-            <div>
+            <div className="mt-4">
               <button
-                className="btn btn-dark mt-3"
+                className="btn btn-dark"
                 onClick={() => {
                   window.location.reload();
                 }}
@@ -146,69 +150,59 @@ const Home = () => {
               </button>
             </div>
           </div>
-          <div className="col-11 col-md-9 mt-3">
-            <h1>Products</h1>
-            <div className="d-flex flex-wrap">
-              {products?.map((p) => {
-                return (
-                  <div
-                    className="card m-1 p-2 mx-auto"
-                    style={{ width: "18rem" }}
-                    key={p._id}
-                  >
-                    <img
-                      src={`/api/v1/product/get-photo/${p._id}`}
-                      className="card-img-top"
-                      alt={p.name}
-                      style={{ height: "22rem", objectFit: "contain" }}
-                    />
-                    <div className="card-body">
-                      <h5 className="card-title">{p?.name.substring(0, 30)}</h5>
-                      <p className="card-text">
-                        {p?.description.substring(0, 30)}...
-                      </p>
-                      <p className="card-text">
-                        {"\u20B9 "}
-                        {p?.price}
-                      </p>
-                      <button
-                        className="btn btn-dark ms-1"
-                        onClick={() => navigate(`/product/${p.slug}`)}
-                      >
-                        More details
-                      </button>
-                      <button
-                        className="btn btn-secondary ms-1"
-                        onClick={() => {
-                          setCart([...cart, p]);
-                          toast.success("Item added to cart");
-                          localStorage.setItem(
-                            "cart",
-                            JSON.stringify([...cart, p])
-                          );
-                        }}
-                      >
-                        Add to cart
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            <div>
-              {products && products?.length < count && (
-                <button
-                  className="btn btn-dark m-3"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setPage(page + 1);
-                  }}
-                >
-                  View more products
-                </button>
-              )}
+          <div className="w-full sm:w-1/2 md:w-3/4 mt-3 px-2">
+  <h1 className="text-2xl font-bold">Products</h1>
+  <div className="flex flex-wrap mt-4">
+    {products?.map((p) => {
+      return (
+        <div
+          key={p._id}
+          className="border rounded-md border-gray-300 shadow-md m-2 p-3 w-72"
+        >
+          <img
+            src={`/api/v1/product/get-photo/${p._id}`}
+            className="w-full h-48 object-contain mb-4"
+            alt={p.name}
+          />
+          <div className="">
+            <h5 className="text-xl font-extrabold mb-2">{p?.name.substring(0, 30)}</h5>
+            <p className="text-base mb-2">{p?.description.substring(0, 30)}...</p>
+            <p className="mb-2">₹ {p?.price}</p>
+            <div className="flex justify-between">
+              <button
+                className="btn text-white bg-blue-400 hover:bg-blue-800"
+                onClick={() => navigate(`/product/${p.slug}`)}
+              >
+                More details
+              </button>
+              <button
+                className="btn bg-blue-700 text-white ml-2 hover:bg-blue-800"
+                onClick={() => {
+                  setCart([...cart, p]);
+                  toast.success('Item added to cart');
+                  localStorage.setItem('cart', JSON.stringify([...cart, p]));
+                }}
+              >
+                Add to cart
+              </button>
             </div>
           </div>
+        </div>
+      );
+    })}
+  </div>
+  <div className="mt-4">
+    {products && products?.length < count && (
+      <button
+        className="btn bg-blue-500 text-white hover:bg-blue-800"
+        onClick={() => setPage(page + 1)}
+      >
+        View more products
+      </button>
+    )}
+  </div>
+</div>
+
         </div>
       </div>
     </Layout>

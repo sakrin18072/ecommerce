@@ -4,12 +4,14 @@ import Layout from "../../components/Layout/Layout";
 import axios from "axios";
 import { useCart } from "../../Contexts/CartContext";
 import toast from "react-hot-toast";
+
 const ProductDetail = () => {
   const navigate = useNavigate();
   const [product, setProduct] = useState({});
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [cart, setCart] = useCart();
   const params = useParams();
+
   const getProduct = async () => {
     try {
       const { data } = await axios.get(
@@ -18,102 +20,98 @@ const ProductDetail = () => {
       if (data?.success) {
         setProduct(data.product[0]);
         getSimilarProducts(data.product[0]._id, data.product[0].category._id);
-        console.log(product);
       }
     } catch (error) {
       console.log(error);
     }
   };
+
   const getSimilarProducts = async (pid, cid) => {
     try {
       const { data } = await axios.get(`/api/v1/product/${pid}/${cid}`);
 
       if (data?.success) {
         setRelatedProducts(data?.products);
-        console.log(data);
       }
     } catch (error) {
       console.log(error);
     }
   };
+
   useEffect(() => {
     if (params?.slug) getProduct();
   }, []);
+
   return (
     <Layout>
-      <div className="row container mt-4 mx-auto">
-        <div className="col-10 col-lg-3 mx-auto">
-          <img
-            src={`/api/v1/product/get-photo/${product?._id}`}
-            className="card-img-top"
-            alt={product.name}
-            style={{ height: "22rem", objectFit: "contain" }}
-          />
+      <div className="container mx-auto mt-4 mb-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="mx-auto">
+            <img
+              src={`/api/v1/product/get-photo/${product?._id}`}
+              className="card-img-top"
+              alt={product.name}
+              style={{ height: "22rem", objectFit: "contain" }}
+            />
+          </div>
+          <div className="mx-auto">
+            <h1 className="text-xl font-bold mb-2">{product?.name}</h1>
+            <p className="text-gray-600 mb-4">{product?.description}</p>
+            <p className="text-xl text-blue-500 mb-4">
+              Price: ₹{product?.price}
+            </p>
+            <button
+              className="btn btn-blue w-full mt-4 bg-blue-700 text-white hover:bg-blue-500"
+              onClick={() => {
+                setCart([...cart, product]);
+                toast.success("Item added to cart");
+                localStorage.setItem("cart", JSON.stringify([...cart, product]));
+              }}
+            >
+              Add to Cart
+            </button>
+          </div>
         </div>
-        <div className="col-10 col-lg-7 mx-auto">
-          <h1>{product?.name}</h1>
-          <h6 className="mt-3">{product?.description}</h6>
-          <p className="mt-3">
-            {"Price: \u20B9"} {product?.price}
-          </p>
-          <button
-            className="btn btn-secondary w-100"
-            onClick={() => {
-              setCart([...cart, product]);
-              toast.success("Item added to cart");
-              localStorage.setItem("cart", JSON.stringify([...cart, product]));
-            }}
-          >
-            Add to cart
-          </button>
-        </div>
-        <hr className="mt-3" />
-      </div>
-      <div className="row mx-auto">
-        <h3 className="text-center">
+        <hr className="mt-6" />
+        <h3 className="text-center text-xl font-bold mt-8 mb-4">
           {relatedProducts.length > 0 ? (
-            <h3 className="text-warning" style={{ display: "inline" }}>
-              <h3 style={{ display: "inline" }} className="text-dark">
-                Similar
-              </h3>{" "}
-              Products
-            </h3>
+            <span className="text-blue-500">Similar Products</span>
           ) : (
-            <h3 className="text-warning" style={{ display: "inline" }}>
-              No simlar products found :(
-            </h3>
+            <span className="text-blue-500">No similar products found :(</span>
           )}
         </h3>
-        <div className="d-flex flex-wrap ">
-          {relatedProducts?.map((p) => {
-            return (
-              <div className="card m-1 p-2 mx-auto" style={{ width: "18rem" }}>
-                <img
-                  src={`/api/v1/product/get-photo/${p?._id}`}
-                  className="card-img-top"
-                  alt={p.name}
-                  style={{ height: "22rem", objectFit: "contain" }}
-                />
-                <div className="card-body">
-                  <h5 className="card-title">{p?.name.substring(0, 30)}</h5>
-                  <p className="card-text">
-                    {p?.description.substring(0, 30)}...
-                  </p>
-                  <p className="card-text">
-                    {"\u20B9 "}
-                    {p?.price}
-                  </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {relatedProducts?.map((p) => (
+            <div
+              key={p._id}
+              className="border rounded-md border-blue-300 bg-blue-100 shadow p-4"
+            >
+              <img
+                src={`/api/v1/product/get-photo/${p._id}`}
+                className="card-img-top"
+                alt={p.name}
+                style={{ height: "22rem", objectFit: "contain" }}
+              />
+              <div className="mt-4">
+                <h5 className="text-lg font-bold text-blue-700 mb-2">
+                  {p?.name.substring(0, 30)}
+                </h5>
+                <p className="text-base text-gray-600 mb-2">
+                  {p?.description.substring(0, 30)}...
+                </p>
+                <p className="text-lg text-blue-700 mb-4">₹{p?.price}</p>
+                <div className="flex justify-between">
                   <button
-                    className="btn btn-dark ms-1"
+                    className="btn btn-blue w-full"
                     onClick={() => {
                       navigate(`/product/${p.slug}`);
                       window.location.reload();
                     }}
                   >
-                    More details
+                    More Details
                   </button>
                   <button
-                    className="btn btn-secondary ms-1"
+                    className="btn btn-blue w-full ml-2"
                     onClick={() => {
                       setCart([...cart, p]);
                       toast.success("Item added to cart");
@@ -123,12 +121,12 @@ const ProductDetail = () => {
                       );
                     }}
                   >
-                    Add to cart
+                    Add to Cart
                   </button>
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </div>
     </Layout>

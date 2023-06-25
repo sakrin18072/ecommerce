@@ -8,6 +8,7 @@ import { AuthProvider } from "./Contexts/AuthorizationContext";
 import { CartProvider } from "./Contexts/CartContext";
 import "antd/dist/reset.css";
 import { SearchProvider } from "./Contexts/SearchContext";
+import('preline')
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <AuthProvider>
