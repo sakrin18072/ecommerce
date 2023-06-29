@@ -7,7 +7,10 @@ const orderSchema = mongoose.Schema({
             ref:'productModel'
         }
     ],
-    payment:{},
+    payment:{
+        type:String,
+        required:true
+    },
     buyer:{
         type:mongoose.ObjectId,
         ref:'users'

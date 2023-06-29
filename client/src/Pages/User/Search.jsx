@@ -1,7 +1,7 @@
 import React from "react";
 import { useSearch } from "../../Contexts/SearchContext";
 import Layout from "../../components/Layout/Layout";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../../Contexts/CartContext";
 import toast from 'react-hot-toast'
 const Search = () => {
@@ -10,55 +10,36 @@ const Search = () => {
   const navigate = useNavigate();
   return (
     <Layout>
-      <div className="container">
-        <div className="text-center m-3">
-          {search.result.length < 1 ? (
-            <h1>No Products found :(</h1>
-          ) : (
-            <h1>{`${search.result.length} items found`}</h1>
-          )}
-        </div>
-
-        <div className="d-flex flex-wrap ">
+      <div className="flex justify-center gap-x-4 gap-y-4">
+        <div className="flex justify-center mx-72">
           {search?.result?.map((p) => {
             return (
-              <div className="card m-1 p-2 mx-auto" style={{ width: "18rem" }}>
-                <img
-                  src={`/api/v1/product/get-photo/${p?._id}`}
-                  className="card-img-top"
-                  alt={p.name}
-                  style={{ height: "22rem", objectFit: "contain" }}
-                />
-                <div className="card-body">
-                  <h5 className="card-title">{p?.name.substring(0, 30)}</h5>
-                  <p className="card-text">
-                    {p?.description.substring(0, 30)}...
-                  </p>
-                  <p className="card-text">
-                    {"\u20B9 "}
-                    {p?.price}
-                  </p>
-                  <button
-                    className="btn bg-blue-400 text-white ms-1 border-transparent hover:bg-blue-600"
-                    onClick={() => {
-                      navigate(`/product/${p.slug}`);
-                      window.location.reload();
-                    }}
-                  >
-                    More details
-                  </button>
-                  <button
-                    className="btn btn-secondary bg-blue-700 ms-1 border-transparent hover:bg-blue-500"
-                    onClick={() => {
-                      setCart([...cart, p]);
-                      toast.success("Item added to cart");
-                      localStorage.setItem('cart',JSON.stringify([...cart,p]))
-                    }}
-                  >
-                    Add to cart
-                  </button>
-                </div>
-              </div>
+              <Link
+                                        to={`/product/${p.slug}`}
+                                        key={p._id}
+                                        className="border rounded-md border-gray-300 shadow-md m-2 p-3 w-52 hover:scale-110 transition"
+                                    >
+                                        <img
+                                            src={`/api/v1/product/get-photo/${p._id}`}
+                                            className="w-full h-48 object-contain mb-4"
+                                            alt={p.name}
+                                        />
+                                        <div className="">
+                                            <h5 className="text-xl font-extrabold mb-2">
+                                                {p?.name.substring(0, 30)}
+                                            </h5>
+                                            <p className="text-base mb-2">
+                                                {p?.description.substring(
+                                                    0,
+                                                    30
+                                                )}
+                                                ...
+                                            </p>
+                                            <p className="mb-2 font-extrabold">
+                                                ₹ {p?.price}
+                                            </p>
+                                        </div>
+                                    </Link>
             );
           })}
         </div>

@@ -84,8 +84,8 @@ const AdminOrders = () => {
                           </Select>
                         </td>
                         <td>{o?.buyer?.name}</td>
-                        <td>{moment(o?.createdAt).fromNow()}</td>
-                        <td>{o?.payment?.success ? "Success" : "Failed"}</td>
+                        <td>{moment(o?.createdAt).toLocaleString().substring(3,16)}</td>
+                        <td>{o?.payment}</td>
                         <td>{o?.products?.length}</td>
                       </tr>
                     </tbody>

@@ -8,11 +8,12 @@ const AuthProvider = ({children})=>{
         user : null,
         token:''
     })
-    axios.defaults.headers.common['Authorization'] = auth?.token;
+    
     useEffect(()=>{
         const data = localStorage.getItem('auth')
         if(data){
             const parseData = JSON.parse(data)
+            axios.defaults.headers.common['Authorization'] = parseData?.token;
             setAuth({
                 ...auth,
                 user:parseData.user,

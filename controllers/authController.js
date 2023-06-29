@@ -163,7 +163,7 @@ export const getOrdersController = async (request, response) => {
     const orders = await orderModel
       .find({ buyer: request.user._id })
       .populate("products","-photo")
-      .populate("buyer");
+      .populate("buyer").sort({createdAt:-1});
       response.status(201).send({success:true,orders});
   } catch (error) {
     return response.status(400).send({
@@ -179,7 +179,7 @@ export const getAllOrdersController = async (request, response) => {
     const orders = await orderModel
       .find({})
       .populate("products","-photo")
-      .populate("buyer").sort({createdAt:"-1"})
+      .populate("buyer").sort({createdAt:-1})
       response.status(201).send({success:true,orders});
   } catch (error) {
     return response.status(400).send({

@@ -23,6 +23,8 @@ import Search from "./Pages/User/Search";
 import ProductDetail from "./Pages/User/ProductDetail";
 import CartPage from "./Pages/User/CartPage";
 import AdminOrders from "./Pages/Admin/AdminOrders";
+import Success from './Pages/User/Success';
+import Cancel from './Pages/User/Cancel';
 function App() {
   return (
     <div>
@@ -47,7 +49,10 @@ function App() {
           <Route path="admin/update-product/:slug" element={<UpdateProduct />} />          
           <Route path="admin/users" element={<Users />} />   
           <Route path="admin/admin-orders" element={<AdminOrders />} />   
+          
         </Route>
+        <Route path="/success" element={<Success />} />
+        <Route path="/cancel" element={<Cancel />} />
         <Route path="/login" element={<Login />} />
         <Route path="/about" element={<About />} />
         <Route path="/Contact" element={<Contact />} />

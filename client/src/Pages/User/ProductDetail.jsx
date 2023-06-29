@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import Layout from "../../components/Layout/Layout";
 import axios from "axios";
 import { useCart } from "../../Contexts/CartContext";
@@ -80,52 +80,34 @@ const ProductDetail = () => {
             <span className="text-blue-500">No similar products found :(</span>
           )}
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="flex ">
           {relatedProducts?.map((p) => (
-            <div
-              key={p._id}
-              className="border rounded-md border-blue-300 bg-blue-100 shadow p-4"
-            >
-              <img
+            <Link
+            onClick={(e)=>{e.preventDefault();navigate(`/product/${p.slug}`);window.location.reload();}}
+            key={p._id}
+            className="border rounded-md border-gray-300 shadow-md m-2 p-3 w-52 hover:scale-110 transition"
+        >
+            <img
                 src={`/api/v1/product/get-photo/${p._id}`}
-                className="card-img-top"
+                className="w-full h-48 object-contain mb-4"
                 alt={p.name}
-                style={{ height: "22rem", objectFit: "contain" }}
-              />
-              <div className="mt-4">
-                <h5 className="text-lg font-bold text-blue-700 mb-2">
-                  {p?.name.substring(0, 30)}
+            />
+            <div className="">
+                <h5 className="text-xl font-extrabold mb-2">
+                    {p?.name.substring(0, 30)}
                 </h5>
-                <p className="text-base text-gray-600 mb-2">
-                  {p?.description.substring(0, 30)}...
+                <p className="text-base mb-2">
+                    {p?.description.substring(
+                        0,
+                        30
+                    )}
+                    ...
                 </p>
-                <p className="text-lg text-blue-700 mb-4">₹{p?.price}</p>
-                <div className="flex justify-between">
-                  <button
-                    className="btn btn-blue w-full"
-                    onClick={() => {
-                      navigate(`/product/${p.slug}`);
-                      window.location.reload();
-                    }}
-                  >
-                    More Details
-                  </button>
-                  <button
-                    className="btn btn-blue w-full ml-2"
-                    onClick={() => {
-                      setCart([...cart, p]);
-                      toast.success("Item added to cart");
-                      localStorage.setItem(
-                        "cart",
-                        JSON.stringify([...cart, p])
-                      );
-                    }}
-                  >
-                    Add to Cart
-                  </button>
-                </div>
-              </div>
+                <p className="mb-2 font-extrabold">
+                    ₹ {p?.price}
+                </p>
             </div>
+        </Link>
           ))}
         </div>
       </div>

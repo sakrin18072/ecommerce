@@ -1,386 +1,376 @@
 import fs from "fs";
 import slugify from "slugify";
 import productModel from "../models/productModel.js";
-import braintree from "braintree";
 import orderModel from "../models/orderModel.js";
 import dotenv from "dotenv";
+import stripe from "stripe";
 dotenv.config();
-var gateway = new braintree.BraintreeGateway({
-  environment: braintree.Environment.Sandbox,
-  publicKey: process.env.BRAINTREE_PUBLIC_KEY,
-  merchantId: process.env.BRAINTREE_MERCHANT_ID,
-  privateKey: process.env.BRAINTREE_PRIVATE_KEY,
-});
 
 export const createProductController = async (request, response) => {
-  try {
-    const { name, slug, description, price, category, quantity, shipping } =
-      request.fields;
-    const { photo } = request.files;
-    if (!name)
-      return response
-        .status(500)
-        .send({ success: false, message: "Name is required" });
-    if (!description)
-      return response
-        .status(500)
-        .send({ success: false, message: "Description is required" });
-    if (!price)
-      return response
-        .status(500)
-        .send({ success: false, message: "Price is required" });
-    if (!category)
-      return response
-        .status(500)
-        .send({ success: false, message: "Category is required" });
-    if (!quantity)
-      return response
-        .status(500)
-        .send({ success: false, message: "Quantity is required" });
-    if (photo && photo.size > 1000000)
-      return response.status(500).send({
-        success: false,
-        message: "Photo is required and its size must be less than 1MB",
-      });
+    try {
+        const { name, slug, description, price, category, quantity, shipping } =
+            request.fields;
+        const { photo } = request.files;
+        if (!name)
+            return response
+                .status(500)
+                .send({ success: false, message: "Name is required" });
+        if (!description)
+            return response
+                .status(500)
+                .send({ success: false, message: "Description is required" });
+        if (!price)
+            return response
+                .status(500)
+                .send({ success: false, message: "Price is required" });
+        if (!category)
+            return response
+                .status(500)
+                .send({ success: false, message: "Category is required" });
+        if (!quantity)
+            return response
+                .status(500)
+                .send({ success: false, message: "Quantity is required" });
+        if (photo && photo.size > 1000000)
+            return response.status(500).send({
+                success: false,
+                message: "Photo is required and its size must be less than 1MB",
+            });
 
-    const product = await new productModel({
-      ...request.fields,
-      slug: slugify(name),
-    });
+        const product = await new productModel({
+            ...request.fields,
+            slug: slugify(name),
+        });
 
-    if (photo) {
-      product.photo.data = fs.readFileSync(photo.path);
-      product.photo.contentType = photo.type;
+        if (photo) {
+            product.photo.data = fs.readFileSync(photo.path);
+            product.photo.contentType = photo.type;
+        }
+        await product.save();
+        return response.status(201).send({
+            success: true,
+            message: "Product created successfully",
+            product,
+        });
+    } catch (error) {
+        console.log(error);
+        response.status(500).send({
+            success: false,
+            message: "error in creating product",
+            error,
+        });
     }
-    await product.save();
-    return response.status(201).send({
-      success: true,
-      message: "Product created successfully",
-      product,
-    });
-  } catch (error) {
-    console.log(error);
-    response.status(500).send({
-      success: false,
-      message: "error in creating product",
-      error,
-    });
-  }
 };
 
 export const productController = async (request, response) => {
-  try {
-    const products = await productModel
-      .find({})
-      .populate("category")
-      .select("-photo")
-      .limit(10)
-      .sort({ createdAt: -1 });
-    return response.status(200).send({
-      success: true,
-      message: "All products",
-      products,
-    });
-  } catch (error) {
-    console.log(error);
-    response.status(500).send({
-      success: false,
-      message: "error in getting products",
-      error,
-    });
-  }
+    try {
+        const products = await productModel
+            .find({})
+            .populate("category")
+            .select("-photo")
+            .limit(10)
+            .sort({ createdAt: -1 });
+        return response.status(200).send({
+            success: true,
+            message: "All products",
+            products,
+        });
+    } catch (error) {
+        console.log(error);
+        response.status(500).send({
+            success: false,
+            message: "error in getting products",
+            error,
+        });
+    }
 };
 
 export const singleProductController = async (request, response) => {
-  try {
-    const product = await productModel
-      .find({ slug: request.params.slug })
-      .populate("category");
-    if (!product) {
-      return response.status(500).send({
-        success: false,
-        message: "Unable to fetch product currently",
-      });
+    try {
+        const product = await productModel
+            .find({ slug: request.params.slug })
+            .populate("category");
+        if (!product) {
+            return response.status(500).send({
+                success: false,
+                message: "Unable to fetch product currently",
+            });
+        }
+        return response.status(200).send({
+            success: true,
+            message: "Single product fetched",
+            product,
+        });
+    } catch (error) {
+        console.log(error);
+        response.status(500).send({
+            success: false,
+            message: "error in getting single product",
+            error,
+        });
     }
-    return response.status(200).send({
-      success: true,
-      message: "Single product fetched",
-      product,
-    });
-  } catch (error) {
-    console.log(error);
-    response.status(500).send({
-      success: false,
-      message: "error in getting single product",
-      error,
-    });
-  }
 };
 
 export const getPhotoController = async (request, response) => {
-  try {
-    const product = await productModel
-      .findById(request.params.pid)
-      .select("photo");
-    if (product?.photo?.data) {
-      response.set("Content-type", product.photo.contentType);
-      return response.status(200).send(product.photo.data);
+    try {
+        const product = await productModel
+            .findById(request.params.pid)
+            .select("photo");
+        if (product?.photo?.data) {
+            response.set("Content-type", product.photo.contentType);
+            return response.status(200).send(product.photo.data);
+        }
+        return response.status(200).send({
+            success: false,
+            message: "No photo data found",
+        });
+    } catch (error) {
+        console.log(error);
+        response.status(500).send({
+            success: false,
+            message: "error in getting single product",
+            error,
+        });
     }
-    return response.status(200).send({
-      success: false,
-      message: "No photo data found",
-    });
-  } catch (error) {
-    console.log(error);
-    response.status(500).send({
-      success: false,
-      message: "error in getting single product",
-      error,
-    });
-  }
 };
 
 export const deleteProductController = async (request, response) => {
-  try {
-    await productModel.findByIdAndDelete(request.params.pid);
-    return response.status(200).send({
-      success: true,
-      message: "Product deleted successfully",
-    });
-  } catch (error) {
-    console.log(error);
-    response.status(500).send({
-      success: false,
-      message: "error in deleting product",
-      error,
-    });
-  }
+    try {
+        await productModel.findByIdAndDelete(request.params.pid);
+        return response.status(200).send({
+            success: true,
+            message: "Product deleted successfully",
+        });
+    } catch (error) {
+        console.log(error);
+        response.status(500).send({
+            success: false,
+            message: "error in deleting product",
+            error,
+        });
+    }
 };
 
 export const updateProductController = async (request, response) => {
-  try {
-    const { name, slug, description, price, category, quantity, shipping } =
-      request.fields;
-    const { photo } = request.files;
-    if (!name)
-      return response
-        .status(500)
-        .send({ success: false, message: "Name is required" });
-    if (!description)
-      return response
-        .status(500)
-        .send({ success: false, message: "Description is required" });
-    if (!price)
-      return response
-        .status(500)
-        .send({ success: false, message: "Price is required" });
-    if (!category)
-      return response
-        .status(500)
-        .send({ success: false, message: "Category is required" });
-    if (!quantity)
-      return response
-        .status(500)
-        .send({ success: false, message: "Quantity is required" });
-    if (photo && photo?.size > 1000000)
-      return response.status(500).send({
-        success: false,
-        message: "Photo size must be less than 1MB",
-      });
+    try {
+        const { name, slug, description, price, category, quantity, shipping } =
+            request.fields;
+        const { photo } = request.files;
+        if (!name)
+            return response
+                .status(200)
+                .send({ success: false, message: "Name is required" });
+        if (!description)
+            return response
+                .status(200)
+                .send({ success: false, message: "Description is required" });
+        if (!price)
+            return response
+                .status(200)
+                .send({ success: false, message: "Price is required" });
+        if (!category)
+            return response
+                .status(200)
+                .send({ success: false, message: "Category is required" });
+        if (!quantity)
+            return response
+                .status(200)
+                .send({ success: false, message: "Quantity is required" });
+        if (photo && photo?.size > 1000000)
+            return response.status(200).send({
+                success: false,
+                message: "Photo size must be less than 1MB",
+            });
 
-    const product = await productModel.findByIdAndUpdate(
-      request.params.pid,
-      { ...request.fields, slug: slugify(name) },
-      { new: true }
-    );
+        const product = await productModel.findByIdAndUpdate(
+            request.params.pid,
+            { ...request.fields, slug: slugify(name) },
+            { new: true }
+        );
 
-    if (photo) {
-      product.photo.data = fs.readFileSync(photo.path);
-      product.photo.contentType = photo.type;
+        if (photo) {
+            product.photo.data = fs.readFileSync(photo.path);
+            product.photo.contentType = photo.type;
+        }
+        await product.save();
+        return response.status(201).send({
+            success: true,
+            message: "Product updated successfully",
+            product,
+        });
+    } catch (error) {
+        console.log(error);
+        response.status(500).send({
+            success: false,
+            message: "error in updating product",
+            error,
+        });
     }
-    await product.save();
-    return response.status(201).send({
-      success: true,
-      message: "Product updated successfully",
-      product,
-    });
-  } catch (error) {
-    console.log(error);
-    response.status(500).send({
-      success: false,
-      message: "error in updating product",
-      error,
-    });
-  }
 };
 
 export const filterProductController = async (request, response) => {
-  try {
-    const { checked, radio } = request.body;
-    let args = {};
-    if (checked.length > 0) {
-      args.category = checked;
+    try {
+        const { checked, radio } = request.body;
+        let args = {};
+        if (checked.length > 0) {
+            args.category = checked;
+        }
+        if (radio.length) {
+            args.price = { $gte: radio[0], $lte: radio[1] };
+        }
+        const products = await productModel.find(args);
+        return response.status(200).send({
+            success: true,
+            products,
+        });
+    } catch (error) {
+        console.log(error);
+        response.status(400).send({
+            success: false,
+            message: "Error in filtering products",
+            error,
+        });
     }
-    if (radio.length) {
-      args.price = { $gte: radio[0], $lte: radio[1] };
-    }
-    const products = await productModel.find(args);
-    return response.status(200).send({
-      success: true,
-      products,
-    });
-  } catch (error) {
-    console.log(error);
-    response.status(400).send({
-      success: false,
-      message: "Error in filtering products",
-      error,
-    });
-  }
 };
 
 export const productCountController = async (request, response) => {
-  try {
-    const count = await productModel.find({}).estimatedDocumentCount();
-    response.status(200).send({
-      success: true,
-      count,
-    });
-  } catch (error) {
-    console.log(error);
-    response.status(400).send({
-      success: false,
-      message: "Error in fetching product count",
-      error,
-    });
-  }
+    try {
+        const count = await productModel.find({}).estimatedDocumentCount();
+        response.status(200).send({
+            success: true,
+            count,
+        });
+    } catch (error) {
+        console.log(error);
+        response.status(400).send({
+            success: false,
+            message: "Error in fetching product count",
+            error,
+        });
+    }
 };
 
 export const productPageController = async (request, response) => {
-  try {
-    const page = request.params.page ? request.params.page : 1;
-    const itemsPerPage = 6;
-    const products = await productModel
-      .find({})
-      .select("-photo")
-      .skip((page - 1) * itemsPerPage)
-      .limit(itemsPerPage)
-      .sort({ createdAt: -1 });
-    response.status(200).send({
-      success: true,
-      message: "Products fetched successfully",
-      products,
-    });
-  } catch (error) {
-    console.log(error);
-    response.status(400).send({
-      success: false,
-      message: "Error in product page controller",
-      error,
-    });
-  }
+    try {
+        const page = request.params.page ? request.params.page : 1;
+        const itemsPerPage = 6;
+        const products = await productModel
+            .find({})
+            .select("-photo")
+            .skip((page - 1) * itemsPerPage)
+            .limit(itemsPerPage)
+            .sort({ createdAt: -1 });
+        response.status(200).send({
+            success: true,
+            message: "Products fetched successfully",
+            products,
+        });
+    } catch (error) {
+        console.log(error);
+        response.status(400).send({
+            success: false,
+            message: "Error in product page controller",
+            error,
+        });
+    }
 };
 
 export const searchProductController = async (request, response) => {
-  try {
-    const { key } = request.params;
-    const result = await productModel
-      .find({
-        $or: [
-          { name: { $regex: key, $options: "i" } },
-          { description: { $regex: key, $options: "i" } },
-        ],
-      })
-      .select("-photo");
-    return response.status(201).send({
-      success: true,
-      products: result,
-    });
-  } catch (error) {
-    console.log(error);
-    response.status(400).send({
-      success: false,
-      message: "Error in searchProductController",
-      error,
-    });
-  }
+    try {
+        const { key } = request.params;
+        const result = await productModel
+            .find({
+                $or: [
+                    { name: { $regex: key, $options: "i" } },
+                    { description: { $regex: key, $options: "i" } },
+                ],
+            })
+            .select("-photo");
+        return response.status(201).send({
+            success: true,
+            products: result,
+        });
+    } catch (error) {
+        console.log(error);
+        response.status(400).send({
+            success: false,
+            message: "Error in searchProductController",
+            error,
+        });
+    }
 };
 
 export const similarProductsController = async (request, response) => {
-  try {
-    const { pid, cid } = request.params;
-    const products = await productModel
-      .find({
-        category: cid,
-        _id: { $ne: pid },
-      })
-      .select("-photo")
-      .limit(9)
-      .populate("category");
-    return response.status(201).send({
-      success: true,
-      products,
-    });
-  } catch (error) {
-    console.log(error);
-    response.status(400).send({
-      success: false,
-      message: "Error in similar Products Controller",
-      error,
-    });
-  }
+    try {
+        const { pid, cid } = request.params;
+        const products = await productModel
+            .find({
+                category: cid,
+                _id: { $ne: pid },
+            })
+            .select("-photo")
+            .limit(9)
+            .populate("category");
+        return response.status(201).send({
+            success: true,
+            products,
+        });
+    } catch (error) {
+        console.log(error);
+        response.status(400).send({
+            success: false,
+            message: "Error in similar Products Controller",
+            error,
+        });
+    }
 };
 
-export const brainTreeTokenController = async (request, response) => {
-  try {
-    gateway.clientToken.generate({}, (error, result) => {
-      if (error) {
-        response.status(500).send(error);
-      } else {
-        response.send(result);
-      }
-    });
-  } catch (error) {
-    console.log(error);
-    response.status(400).send({
-      success: false,
-      message: "Error in braintree token controller",
-      error,
-    });
-  }
+let stripeGateway = stripe(process.env.STRIPE_KEY);
+
+export const stripePaymentController = async (request, response) => {
+    try {
+        const lineItems = request.body.items.map((item) => {
+            console.log("Item-price: ", item.price);
+            return {
+                price_data: {
+                    currency: "inr",
+                    product_data: {
+                        name: item.name,
+                    },
+                    unit_amount: item.price*100,
+                },
+                quantity: 1,
+            };
+        });
+        console.log("Line Items: ", lineItems);
+
+        const session = await stripeGateway.checkout.sessions.create({
+            payment_method_types: ["card"],
+            line_items: lineItems,
+            mode: "payment",
+            success_url: `http://localhost:3000/success`,
+            cancel_url: `http://localhost:3000/cancel`,
+            // Asking address in stripe checkout page
+            billing_address_collection: "required",
+        });
+        response.send({ success: true, url: session.url });
+    } catch (error) {
+        console.log(error);
+    }
 };
-export const brainTreePaymentController = async (request, response) => {
-  try {
-    const { cart, nonce } = request.body;
-    let total = 0;
-    cart.map((i) => (total += i.price));
-    let newTransaction = gateway.transaction.sale(
-      {
-        amount: total,
-        paymentMethodNonce: nonce,
-        options: {
-          submitForSettlement: true,
-        },
-      },
-      (error, result) => {
-        if (result) {
-          const order = new orderModel({
+
+export const createOrderController = async (req, res) => {
+    try {
+        const { cart, payment } = req.body;
+        const order = new orderModel({
             products: [...cart],
-            payment: result,
-            buyer: request.user._id,
-          }).save();
-          response.send({ ok: true });
-        } else {
-          response.status(500).send(error);
-        }
-      }
-    );
-  } catch (error) {
-    console.log(error);
-    response.status(400).send({
-      success: false,
-      message: "Error in braintree payment controller",
-      error,
-    });
-  }
+            payment,
+            buyer: req.user._id,
+        })
+        console.log(order);
+        await order.save();
+        res.send({ success: true, message: "Order created successfully" });
+    } catch (error) {
+        res.send({ success: false, message: "Error creating order" ,error});
+    }
 };

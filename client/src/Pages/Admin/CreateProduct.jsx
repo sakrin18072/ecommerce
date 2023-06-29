@@ -42,8 +42,8 @@ const CreateProduct = () => {
       dat.append("quantity", quantity);
       dat.append("photo", photo);
       dat.append("shipping", shipping);
-      const { infor } = await axios.post("/api/v1/product/create-product", dat);
-      toast.success(infor?.message);
+      const { data } = await axios.post("/api/v1/product/create-product", dat);
+      toast.success(data?.message);
       navigate("/dashboard/admin/products");
     } catch (error) {
       console.log(error);
