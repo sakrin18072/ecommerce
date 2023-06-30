@@ -348,8 +348,8 @@ export const stripePaymentController = async (request, response) => {
             payment_method_types: ["card"],
             line_items: lineItems,
             mode: "payment",
-            success_url: `http://localhost:3000/success`,
-            cancel_url: `http://localhost:3000/cancel`,
+            success_url: `https://sore-lime-cockatoo-robe.cyclic.app/success`,
+            cancel_url: `https://sore-lime-cockatoo-robe.cyclic.app/cancel`,
             // Asking address in stripe checkout page
             billing_address_collection: "required",
         });
